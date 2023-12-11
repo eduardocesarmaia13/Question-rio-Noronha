@@ -268,14 +268,15 @@ perguntas = {
         "(4) Ruim",
         "(5) Muito ruim"
     ],
-    "SEÇÃO 5: PONTOS DE INFORMAÇÃO E CONTROLE (PIC)": [
-        "31. Você sabe o que é o Pontos de Informação e Controle (PIC)?",
+    "SEÇÃO 5: PONTOS DE INFORMAÇÃO E CONTROLE (PIC)\n31. Você sabe o que é o Pontos de Informação e Controle (PIC)?": [
         "(1) Sim",
         "(2) Não",
-        "32. Você utilizou algum PIC durante sua viagem?",
+    ],
+        "32. Você utilizou algum PIC durante sua viagem?": [
         "(1) Sim",
         "(2) Não",
-        "33. Com qual finalidade você usou o PIC?",
+    ],
+        "33. Com qual finalidade você usou o PIC?": [
         "(1) Informação",
         "(2) Compras na loja de souvenir",
         "(3) Lanchonete",
@@ -283,21 +284,24 @@ perguntas = {
         "(5) Refil da garrafa de água do Econoronha",
         "(6) Não utilizei",
         "(7) Outros",
-        "34. Como você avalia a localização dos Pontos de Informação e Controle (PIC)?",
+    ],
+        "34. Como você avalia a localização dos Pontos de Informação e Controle (PIC)?": [
         "(1) Muito bom",
         "(2) Bom",
         "(3) Regular",
         "(4) Ruim",
         "(5) Muito ruim",
         "(6) Não utilizei o PIC",
-        "35. Se você foi ao PIC, como você avalia o atendimento no PIC?",
+    ],
+        "35. Se você foi ao PIC, como você avalia o atendimento no PIC?": [
         "(1) Muito bom",
         "(2) Bom",
         "(3) Regular",
         "(4) Ruim",
         "(5) Muito ruim",
         "(6) Não utilizei o PIC",
-        "36. Se você foi ao PIC, como você avalia a infraestrutura no PIC?",
+    ],
+        "36. Se você foi ao PIC, como você avalia a infraestrutura no PIC?": [
         "(1) Muito bom",
         "(2) Bom",
         "(3) Regular",
@@ -305,21 +309,22 @@ perguntas = {
         "(5) Muito ruim",
         "(6) Não utilizei o PIC"
     ],
-    "SEÇÃO 6: AVALIAÇÃO": [
-        "37. Como você avalia sua experiência no parque?",
+    "SEÇÃO 6: AVALIAÇÃO\n37. Como você avalia sua experiência no parque?": [
         "(1) Muito bom",
         "(2) Bom",
         "(3) Regular",
         "(4) Ruim",
         "(5) Muito ruim",
         "(6) Não fui ao Parque",
-        "38. Como você avalia sua experiência na ilha?",
+    ],
+        "38. Como você avalia sua experiência na ilha?": [
         "(1) Muito bom",
         "(2) Bom",
         "(3) Regular",
         "(4) Ruim",
         "(5) Muito ruim",
-        "39. Qual ponto turístico do Parque Nacional Marinho você mais gostou?",
+    ],
+        "39. Qual ponto turístico do Parque Nacional Marinho você mais gostou?": [
         "(1) PIC (Praia) do Sancho",
         "(2) Baía dos Porcos",
         "(3) PIC (Praia) do Leão",
@@ -333,9 +338,11 @@ perguntas = {
         "(11) Pontinha Pedra Alta",
         "(12) Caiera",
         "(13) Trilha São Joaquim",
-        "40. Qual ponto turístico da ilha você mais gostou?",
+    ],
+        "40. Qual ponto turístico da ilha você mais gostou?": [
         "( ) Outros",
-        "41. Você gostaria de adicionar alguma sugestão?",
+    ],
+        "41. Você gostaria de adicionar alguma sugestão?": [
         "( ) Outros"
     ],
     "Sugestões": [""]
@@ -410,6 +417,8 @@ def abrir_janela_texto_outros():
     outros_entry.pack()
     salvar_resposta_outros_btn = tk.Button(outros_entry_window, text="Salvar", command=salvar_resposta_outros)
     salvar_resposta_outros_btn.pack()
+    outros_entry.bind("<Return>", lambda event: salvar_resposta_outros())
+    outros_entry.focus_set()
 
 def fechar_janela_texto_outros():
     global outros_entry_window
