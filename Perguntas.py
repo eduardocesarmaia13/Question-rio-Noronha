@@ -1,8 +1,18 @@
-import pandas as pd
 import tkinter as tk
+from tkinter import simpledialog
+import openpyxl
+import pandas as pd
 
+# Inicialização da janela principal
 root = tk.Tk()
 root.title("Questionário")
+
+largura = root.winfo_screenwidth() // 2
+altura = root.winfo_screenheight() // 2
+pos_x = (root.winfo_screenwidth() - largura) // 2
+pos_y = (root.winfo_screenheight() - altura) // 2
+
+root.geometry(f"{largura}x{altura}+{pos_x}+{pos_y}")
 
 frame = tk.Frame(root)
 frame.pack(padx=10, pady=10)
@@ -12,7 +22,7 @@ respostas = {}
 
 # Definindo as perguntas e opções de resposta
 perguntas = {
-    "Local onde a pesquisa foi aplicada (preenchimento interno)": [
+    "1. Local onde a pesquisa foi aplicada (preenchimento interno)": [
         "(1) Aeroporto",
         "(2) Ponto turístico do ParNaMar",
         "(3) Pousada",
@@ -268,7 +278,7 @@ perguntas = {
         "(4) Ruim",
         "(5) Muito ruim"
     ],
-    "SEÇÃO 5: PONTOS DE INFORMAÇÃO E CONTROLE (PIC)\n31. Você sabe o que é o Pontos de Informação e Controle (PIC)?": [
+    "31. Você sabe o que é o Pontos de Informação e Controle (PIC)?": [
         "(1) Sim",
         "(2) Não",
     ],
@@ -283,7 +293,7 @@ perguntas = {
         "(4) Tomar ducha, Banheiro",
         "(5) Refil da garrafa de água do Econoronha",
         "(6) Não utilizei",
-        "(7) Outros",
+        "( ) Outros",
     ],
         "34. Como você avalia a localização dos Pontos de Informação e Controle (PIC)?": [
         "(1) Muito bom",
@@ -309,7 +319,7 @@ perguntas = {
         "(5) Muito ruim",
         "(6) Não utilizei o PIC"
     ],
-    "SEÇÃO 6: AVALIAÇÃO\n37. Como você avalia sua experiência no parque?": [
+    "37. Como você avalia sua experiência no parque?": [
         "(1) Muito bom",
         "(2) Bom",
         "(3) Regular",
@@ -345,16 +355,38 @@ perguntas = {
         "41. Você gostaria de adicionar alguma sugestão?": [
         "( ) Outros"
     ],
-    "Sugestões": [""]
+    "Sugestões": [
+        "( ) Outros"
+    ],
 }
 
 perguntas_list = list(perguntas.items())
 num_pergunta_atual = 0
 resposta_var = tk.StringVar(value="")
 
-outros_var = tk.StringVar()  # Variável para armazenar a resposta "Outros"
-outros_entry = tk.Entry(frame, textvariable=outros_var)  # Campo de entrada para "Outros"
+# Variável para armazenar a resposta "Outros"
+outros_var = tk.StringVar()
+outros_entry = tk.Entry(frame, textvariable=outros_var)
 
+# Função para obter o número do formulário
+def obter_numero_formulario():
+    global numero_formulario
+    numero_formulario = simpledialog.askstring("Número de formulário", "Insira o número de formulário:")
+    if numero_formulario:
+        root.withdraw()  # Esconde a janela principal
+        iniciar_questionario()
+    else:
+        root.destroy()
+
+# Função para iniciar o questionário
+def iniciar_questionario():
+    global respostas, num_pergunta_atual
+    respostas = {}
+    num_pergunta_atual = 0
+    criar_pergunta(perguntas_list[num_pergunta_atual][0], perguntas_list[num_pergunta_atual][1])
+    root.deiconify()  # Exibe a janela principal
+
+# Função para salvar a resposta atual e passar para a próxima pergunta
 def salvar_resposta(event=None):
     resposta = resposta_var.get()
     if resposta:
@@ -364,6 +396,7 @@ def salvar_resposta(event=None):
 
 root.bind("<Return>", salvar_resposta)
 
+# Função para avançar para a próxima pergunta
 def proxima_pergunta():
     global num_pergunta_atual
     num_pergunta_atual += 1
@@ -372,11 +405,19 @@ def proxima_pergunta():
     else:
         finalizar_questionario()
 
+# Função para reiniciar o questionário
+def reiniciar_questionario():
+    global respostas, num_pergunta_atual
+    respostas = {}
+    num_pergunta_atual = 0
+    criar_pergunta(perguntas_list[num_pergunta_atual][0], perguntas_list[num_pergunta_atual][1])
+
+# Função para criar a interface de perguntas
 def criar_pergunta(pergunta, opcoes):
     for widget in frame.winfo_children():
         widget.destroy()
 
-    label = tk.Label(frame, text=pergunta)
+    label = tk.Label(frame, text=pergunta, padx=20, pady=10)
     label.pack()
 
     resposta_var.set("")
@@ -399,32 +440,46 @@ def criar_pergunta(pergunta, opcoes):
         voltar_btn = tk.Button(btn_frame, text="Voltar", command=voltar_pergunta)
         voltar_btn.pack(side=tk.LEFT)
 
-    proxima_pergunta_btn = tk.Button(btn_frame, text="Próxima Pergunta", command=salvar_resposta)
-    proxima_pergunta_btn.pack(side=tk.LEFT)
+    if num_pergunta_atual < len(perguntas_list) - 1:
+        proxima_pergunta_btn = tk.Button(btn_frame, text="Próxima Pergunta", command=salvar_resposta)
+        proxima_pergunta_btn.pack(side=tk.LEFT)
+    else:
+        finalizar_btn = tk.Button(btn_frame, text="Finalizar", command=finalizar_questionario)
+        finalizar_btn.pack(side=tk.LEFT)
 
+# Função para exibir a caixa de texto para 'Outros'
 def exibir_caixa_outros():
     if resposta_var.get() == "( ) Outros":
         abrir_janela_texto_outros()
     else:
         fechar_janela_texto_outros()
 
+# Função para abrir a janela de texto para 'Outros'
 def abrir_janela_texto_outros():
     global outros_entry_window
     outros_entry_window = tk.Toplevel(root)
     outros_entry_window.title("Resposta para 'Outros'")
     outros_var.set("")
-    outros_entry = tk.Entry(outros_entry_window, textvariable=outros_var)
-    outros_entry.pack()
+    outros_entry = tk.Entry(outros_entry_window, textvariable=outros_var, width=50)
+    outros_entry.pack(padx=20, pady=10)
     salvar_resposta_outros_btn = tk.Button(outros_entry_window, text="Salvar", command=salvar_resposta_outros)
     salvar_resposta_outros_btn.pack()
     outros_entry.bind("<Return>", lambda event: salvar_resposta_outros())
     outros_entry.focus_set()
 
+    largura_janela_outros = 500
+    altura_janela_outros = 200
+    pos_x_outros = (outros_entry_window.winfo_screenwidth() - largura_janela_outros) // 2
+    pos_y_outros = (outros_entry_window.winfo_screenheight() - altura_janela_outros) // 2
+    outros_entry_window.geometry(f"{largura_janela_outros}x{altura_janela_outros}+{pos_x_outros}+{pos_y_outros}")
+
+# Função para fechar a janela de texto para 'Outros'
 def fechar_janela_texto_outros():
     global outros_entry_window
     if outros_entry_window is not None:
         outros_entry_window.destroy()
 
+# Função para salvar a resposta de 'Outros'
 def salvar_resposta_outros():
     resposta_outros = outros_var.get()
     if resposta_outros:
@@ -432,15 +487,32 @@ def salvar_resposta_outros():
         fechar_janela_texto_outros()
         proxima_pergunta()
 
+# Função para voltar para a pergunta anterior
 def voltar_pergunta():
     global num_pergunta_atual
     num_pergunta_atual -= 1
     criar_pergunta(perguntas_list[num_pergunta_atual][0], perguntas_list[num_pergunta_atual][1])
 
+# Função para finalizar o questionário
 def finalizar_questionario():
-    df = pd.DataFrame(respostas.items(), columns=['Pergunta', 'Resposta'])
-    print(df)
+    nome_arquivo = f'respostas_questionario_{numero_formulario}.xlsx'
+    perguntas = [pergunta[0] for pergunta in perguntas_list]
+    respostas_list = [resposta for pergunta, resposta in respostas.items()]
+    respostas_completas = respostas_list + [''] * (len(perguntas) - len(respostas_list))
+    dados = {'Pergunta': perguntas, 'Resposta': respostas_completas}
+    df = pd.DataFrame(dados)
 
+    # Dividindo perguntas e respostas em colunas A e B do Excel
+    df['Pergunta'] = df['Pergunta'].astype(str) + ":"
+    df['Resposta'] = df['Resposta'].apply(lambda x: str(x).replace('[', '').replace(']', '').replace(',', '\n'))
+
+    # Salvando em um arquivo do Excel
+    df.to_excel(nome_arquivo, index=False)
+    print(f"Os dados do questionário foram salvos em '{nome_arquivo}'")
+    reiniciar_questionario()
+    root.deiconify()
+
+# Função para selecionar resposta usando teclas numéricas
 def selecionar_resposta(event):
     key = event.char
     if key.isdigit():
@@ -451,5 +523,7 @@ def selecionar_resposta(event):
 root.bind("<Key>", selecionar_resposta)
 
 criar_pergunta(perguntas_list[num_pergunta_atual][0], perguntas_list[num_pergunta_atual][1])
+
+obter_numero_formulario()
 
 root.mainloop()
